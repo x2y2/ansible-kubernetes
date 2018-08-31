@@ -6,15 +6,15 @@
     owner: root
     group: root
     mode: 0644 
-    state: touch
 
 - name: install rsync
-  apt:
-    name: rsync
-    state: present
-     
+  apt: name={{ item }} state=present
+  with_items:
+  - rsync
+  - python
+
 - name: init kubernetes environment
-  file: dest=/data/kubernetes/{{ item }}  state=directory
+  file: path=/data/kubernetes/{{ item }} state=directory
   with_items:
     - conf
     - bin

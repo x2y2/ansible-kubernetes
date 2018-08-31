@@ -26,6 +26,9 @@
   - kube-controller-manager
   - kube-scheduler
 
+- name: send cfssl to master 
+  synchronize: src=/data/roles/ca/files/bin/ dest=/data/kubernetes/bin/
+
 - name: create symbol link
   file: src=/data/kubernetes/bin/kubectl dest=/usr/local/bin/kubectl state=link
 

@@ -32,6 +32,18 @@
   template: src=etcd.conf.template dest=/etc/etcd/etcd.conf  
   notify: restart etcd
  
+- name: send etcd service file to etcd server
+  copy:
+    src: systemd/etcd.service
+    dest: /lib/systemd/system/etcd.service
+  notify: restart etcd
+    
+- name: start etcd service
+  service:
+    name: etcd
+    state: started
+
+
 - name: send flannel-etcd.sh 
   template: src=flannel-etcd.sh.template dest=/data/kubernetes/bin/flannel-etcd.sh 
    
@@ -43,15 +55,3 @@
 - name: create flannel-etcd network
   raw: /bin/bash /data/kubernetes/bin/flannel-etcd.sh
   when: flannel_etcd_output == ""
-
-
-- name: send etcd service file to etcd server
-  copy:
-    src: systemd/etcd.service
-    dest: /lib/systemd/system/etcd.service
-  notify: restart etcd
-    
-- name: start etcd service
-  service:
-    name: etcd
-    state: started
