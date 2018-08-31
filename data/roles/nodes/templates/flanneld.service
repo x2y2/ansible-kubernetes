@@ -1,0 +1,18 @@
+[Unit]
+Description=Flanneld
+Documentation=https://github.com/coreos/flannel
+After=network.target
+Before=docker.service
+
+[Service]
+EnvironmentFile=-/data/kubernetes/conf/flannel
+ExecStartPre=/data/kubernetes/bin/remove-docker0.sh
+ExecStart=/data/kubernetes/bin/flanneld ${FLANNEL_ETCD} ${FLANNEL_ETCD_KEY} ${FLANNEL_ETCD_CAFILE} ${FLANNEL_ETCD_CERTFILE} ${FLANNEL_ETCD_KEYFILE}
+ExecStartPost=/data/kubernetes/bin/mk-docker-opts.sh -d /etc/default/docker -c
+Restart=on-failure
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+

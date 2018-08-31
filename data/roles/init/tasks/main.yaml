@@ -1,0 +1,23 @@
+---
+- name: sync files to all nodes
+  copy: 
+    src: hosts.txt
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644 
+    state: touch
+
+- name: install rsync
+  apt:
+    name: rsync
+    state: present
+     
+- name: init kubernetes environment
+  file: dest=/data/kubernetes/{{ item }}  state=directory
+  with_items:
+    - conf
+    - bin
+    - ssl
+    - logs    
+

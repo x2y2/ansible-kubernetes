@@ -1,0 +1,83 @@
+---
+
+- name: create directories
+  file: path={{ item.path }}  owner=root group=root mode={{ item.mode }}  state=directory
+  with_items:
+  - {path: '/etc/cni/net.d', mode: '0755'}
+  - {path: '/var/lib/kubelet',mode: '0755'}
+  - {path: '/var/lib/kube-proxy', mode: '0755'}                                                                                        
+
+- name: sync files to all nodes                                                                                  
+  synchronize: src=bin/  dest=/data/kubernetes/bin/
+
+- name: sync config files to all nodes
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+  - {src: '10-default.conf', dest: '/etc/cni/net.d/10-default.conf'}
+  - {src: 'flannel', dest: '/data/kubernetes/conf/flannel'}
+  notify: restart flannel
+
+
+- name: sync service files to all nodes
+  template: src={{ item }} dest=/lib/systemd/system/{{ item }}
+  with_items:
+  - flanneld.service
+  - docker.service
+  - kubelet.service
+  - kube-proxy.service
+  notify: restart nodes
+
+
+- name: send ca to all nodes
+  template: src=/data/roles/ca/files/csr/{{ item }} dest=/data/kubernetes/ssl/{{ item }}
+  with_items:
+  - ca.pem
+  - ca-key.pem
+  - ca-config.json
+  - kube-proxy-csr.json
+  notify: restart nodes
+
+- name: create kube-proxy.pem
+  raw: cd /data/kubernetes/ssl && /data/kubernetes/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes  kube-proxy-csr.json | /data/kubernetes/bin/cfssljson -bare kube-proxy
+ 
+- name: bootstrap kubeconfig set-cluster
+  raw: /data/kubernetes/bin/kubectl config set-cluster kubernetes --certificate-authority=/data/kubernetes/ssl/ca.pem --embed-certs=true --server={{ API_SERVER }} --kubeconfig=/data/kubernetes/conf/bootstrap.kubeconfig
+ 
+- name: bootstrap kubeconfig set-credentials
+  raw: /data/kubernetes/bin/kubectl config set-credentials kubelet-bootstrap --token={{ BOOTSTRAP_TOKEN }} --kubeconfig=/data/kubernetes/conf/bootstrap.kubeconfig
+
+- name: bootstrap kubeconfig set-context
+  raw: /data/kubernetes/bin/kubectl config set-context default --cluster=kubernetes --user=kubelet-bootstrap --kubeconfig=/data/kubernetes/conf/bootstrap.kubeconfig
+
+- name: bootstrap kubeconfig default context
+  raw: /data/kubernetes/bin/kubectl config use-context default --kubeconfig=/data/kubernetes/conf/bootstrap.kubeconfig
+
+- name: kube-proxy kubeconfig set-cluster
+  raw: /data/kubernetes/bin/kubectl config set-cluster kubernetes --certificate-authority=/data/kubernetes/ssl/ca.pem --embed-certs=true --server={{ API_SERVER }} --kubeconfig=/data/kubernetes/conf/kube-proxy.kubeconfig
+
+- name: kube-proxy kubeconfig set-credentials
+  raw: /data/kubernetes/bin/kubectl config set-credentials kube-proxy --client-certificate=/data/kubernetes/ssl/kube-proxy.pem --client-key=/data/kubernetes/ssl/kube-proxy-key.pem --embed-certs=true --kubeconfig=/data/kubernetes/conf/kube-proxy.kubeconfig
+
+- name: kube-proxy kubeconfig set-context
+  raw: /data/kubernetes/bin/kubectl config set-context default --cluster kubernetes --user=kube-proxy --kubeconfig=/data/kubernetes/conf/kube-proxy.kubeconfig
+
+- name: kube-proxy kubeconfig default context
+  raw: /data/kubernetes/bin/kubectl config use-context default --kubeconfig=/data/kubernetes/conf/kube-proxy.kubeconfig
+
+
+- name: install ipvsadm ipset conntrack
+  apt: name={{ item }} state=present
+  with_items:
+  - ipvsadm 
+  - ipset 
+  - conntrack
+  - docker.io
+
+- name: start service
+  service: name={{ item }} state=started
+  with_items:
+  - flanneld
+  - docker
+  - kubelet
+  - kube-proxy
+    

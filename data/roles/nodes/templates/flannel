@@ -1,0 +1,5 @@
+FLANNEL_ETCD="{{ ETCD_SERVERS }}"
+FLANNEL_ETCD_KEY="{{ ETCD_PREFIX }}"
+FLANNEL_ETCD_CAFILE="-etcd-cafile=/data/kubernetes/ssl/ca.pem"
+FLANNEL_ETCD_CERTFILE="-etcd-certfile=/data/kubernetes/ssl/kubernetes.pem"
+FLANNEL_ETCD_KEYFILE="-etcd-keyfile=/data/kubernetes/ssl/kubernetes-key.pem"

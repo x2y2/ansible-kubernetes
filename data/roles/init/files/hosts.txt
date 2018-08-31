@@ -1,0 +1,18 @@
+127.0.0.1	localhost
+127.0.1.1	kickseed
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+#etcd
+192.168.100.50 etcd1
+192.168.100.51 etcd2
+192.168.100.52 etcd3
+
+#k8s
+192.168.100.50 master
+192.168.100.51 node1
+192.168.100.52 node2
+

@@ -1,0 +1,57 @@
+- name: send etcd binary files to etcd server
+  copy: src=bin/{{ item }} dest=/data/kubernetes/bin/{{ item }} mode=0755
+  with_items:
+  - etcd
+  - etcdctl
+
+- name: send cfssl tools to etcd server
+  copy: src=/data/roles/ca/files/bin/{{ item }} dest=/data/kubernetes/bin/{{ item }} mode=0755
+  with_items: 
+  - cfssl
+  - cfssljson
+  - cfssl-certinfo
+
+- name: etcd csr
+  copy : src=/data/roles/ca/files/csr/{{ item }} dest=/data/kubernetes/ssl/{{ item }}
+  with_items:
+  - ca-config.json
+  - ca.pem
+  - ca-key.pem
+  - kubernetes-csr.json
+
+- name: create etcd work directory
+  file: path={{ item }} owner=root group=root mode=0755 state=directory
+  with_items:
+  - /var/lib/etcd
+  - /etc/etcd
+
+- name: etcd certs
+  raw: cd /data/kubernetes/ssl && /data/kubernetes/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json  -profile=kubernetes kubernetes-csr.json | /data/kubernetes/bin/cfssljson -bare kubernetes
+
+- name: send etcd config files to etcd server
+  template: src=etcd.conf.template dest=/etc/etcd/etcd.conf  
+  notify: restart etcd
+ 
+- name: send flannel-etcd.sh 
+  template: src=flannel-etcd.sh.template dest=/data/kubernetes/bin/flannel-etcd.sh 
+   
+
+- name: get flannel-etcd network
+  raw: /data/kubernetes/bin/etcdctl --ca-file /data/kubernetes/ssl/ca.pem --cert-file /data/kubernetes/ssl/kubernetes.pem --key-file /data/kubernetes/ssl/kubernetes-key.pem --no-sync -C {{ ETCD_ENDPOINTS }}  get "/kubernetes/network/config"
+  register: flannel_etcd_output
+
+- name: create flannel-etcd network
+  raw: /bin/bash /data/kubernetes/bin/flannel-etcd.sh
+  when: flannel_etcd_output == ""
+
+
+- name: send etcd service file to etcd server
+  copy:
+    src: systemd/etcd.service
+    dest: /lib/systemd/system/etcd.service
+  notify: restart etcd
+    
+- name: start etcd service
+  service:
+    name: etcd
+    state: started

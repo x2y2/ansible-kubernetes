@@ -1,0 +1,2 @@
+#!/bin/bash
+/data/kubernetes/bin/etcdctl --ca-file /data/kubernetes/ssl/ca.pem --cert-file /data/kubernetes/ssl/kubernetes.pem --key-file /data/kubernetes/ssl/kubernetes-key.pem   --no-sync -C {{ ETCD_ENDPOINTS }}  mk /kubernetes/network/config '{"Network": "{{ POD_CIDR }}","Backend": {"Type": "vxlan","VNI": 1}}'
