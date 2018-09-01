@@ -1,0 +1,4 @@
+---
+- include: kubeconfig.yaml
+- include: service.yaml
+- include: clusterrolebinding.yaml

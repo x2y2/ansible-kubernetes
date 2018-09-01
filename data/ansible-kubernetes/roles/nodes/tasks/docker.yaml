@@ -1,0 +1,12 @@
+---
+
+- name: install ipvsadm ipset conntrack
+  apt: name=docker.io state=present
+
+- name: sync service files to all nodes
+  template: src=docker.service dest=/lib/systemd/system/docker.service
+  notify: restart docker
+
+- name: start service
+  service: name=docker state=started
+    

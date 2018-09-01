@@ -1,0 +1,9 @@
+---
+
+- name: get clusterrolebinding
+  raw: kubectl get clusterrolebinding|grep kubelet-bootstrap
+  register: output
+
+- name: create clusterrolebinding                                                                         
+  raw: kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+  when: output == ""

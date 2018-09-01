@@ -1,0 +1,8 @@
+---
+- hosts: node
+  tasks:
+  -  name: restart nodes
+     service: name={{ item }} state=restarted
+     with_items:
+     - kubelet
+     - kube-proxy

@@ -1,0 +1,7 @@
+---
+- include: ansible-kubernetes/init.yaml
+- include: ansible-kubernetes/etcd.yaml
+- include: ansible-kubernetes/master.yaml
+- include: ansible-kubernetes/nodes.yaml
+- include: ansible-kubernetes/csr.yaml
+

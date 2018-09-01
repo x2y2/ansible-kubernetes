@@ -1,0 +1,28 @@
+---
+
+- name: create directories
+  file: 
+    path=/var/lib/kube-proxy
+    owner=root 
+    group=root 
+    mode=0755 
+    state=directory
+
+- name: sync kube-proxy to all nodes
+  synchronize: src=bin/kube-proxy  dest=/data/kubernetes/bin/kube-proxy
+
+
+- name: sync kube-proxy service files to all nodes
+  template: src=kube-proxy.service dest=/lib/systemd/system/kube-proxy.service
+  notify: restart kube-proxy
+
+- name: install ipvsadm ipset conntrack
+  apt: name={{ item }} state=present
+  with_items:
+  - ipvsadm 
+  - ipset 
+  - conntrack
+
+- name: start service
+  service: name=kube-proxy state=started
+    

@@ -1,0 +1,30 @@
+---
+- name: send csv to master server
+  template: src={{ item }} dest=/data/kubernetes/conf/{{ item }} 
+  with_items:
+  - basic-auth.csv
+  - bootstrap-token.csv
+
+- name: send service files to master server
+  template: src={{ item }}.template dest=/lib/systemd/system/{{ item }}
+  with_items:
+  - kube-apiserver.service
+  - kube-controller-manager.service
+  - kube-scheduler.service
+  notify: restart master
+
+
+- name: send binary file to master server
+  copy: src=bin/{{ item }} dest=/data/kubernetes/bin/{{ item }} mode=0755
+  with_items:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+
+- name: start master service
+  service: name={{ item }} state=started
+  with_items:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+

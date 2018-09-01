@@ -1,0 +1,12 @@
+---
+
+- name: send flannel-etcd.sh
+  template: src=flannel-etcd.sh.template dest=/data/kubernetes/bin/flannel-etcd.sh
+
+- name: get flannel-etcd network                                                                          
+  raw: /data/kubernetes/bin/etcdctl --ca-file /data/kubernetes/ssl/ca.pem --cert-file /data/kubernetes/ssl/kubernetes.pem --key-file /data/kubernetes/ssl/kubernetes-key.pem --no-sync -C {{ ETCD_ENDPOINTS }}  get "/kubernetes/network/config"
+  register: flannel_etcd_output                                                                           
+
+- name: create flannel-etcd network                                                                       
+  raw: /bin/bash /data/kubernetes/bin/flannel-etcd.sh                                                     
+  when: flannel_etcd_output == "" 

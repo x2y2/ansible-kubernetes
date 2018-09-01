@@ -1,0 +1,25 @@
+- name: create directories
+  file:
+    path=/etc/cni/net.d
+    owner=root
+    group=root
+    mode=0755
+    state=directory
+
+- name: sync files to all nodes
+  synchronize: src=bin/flanneld  dest=/data/kubernetes/bin/flanneld
+
+
+- name: sync config files to all nodes
+  template: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+  - {src: '10-default.conf', dest: '/etc/cni/net.d/10-default.conf'}
+  - {src: 'flannel', dest: '/data/kubernetes/conf/flannel'}
+  notify: restart flannel
+
+- name: sync service files to all nodes
+  template: src=flanneld.service dest=/lib/systemd/system/flanneld.service
+  notify: restart flannel
+
+- name: start service                                                                                     
+  service: name=flanneld state=started                                                                  

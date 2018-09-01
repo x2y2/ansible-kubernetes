@@ -1,0 +1,18 @@
+---
+- name: sync cfssl to all nodes
+  synchronize: src={{ role_path }}/../ca/files/bin/  dest=/data/kubernetes/bin/
+
+- name: send ca to all nodes                                                                              
+  template: src={{ role_path }}/../ca/files/csr/{{ item }} dest=/data/kubernetes/ssl/{{ item }}           
+  with_items:                                                                                             
+  - ca.pem                                                                                                
+  - ca-key.pem                                                                                            
+  - ca-config.json                                                                                        
+  - kubernetes-csr.json                                                                                   
+  - kube-proxy-csr.json                                                                                   
+  notify: restart nodes                                                                                   
+                                                                                                          
+- name: create kubernetes.pem
+  raw: cd /data/kubernetes/ssl && /data/kubernetes/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json  -profile=kubernetes kubernetes-csr.json | /data/kubernetes/bin/cfssljson -bare kubernetes                                                                 
+- name: create kube-proxy.pem
+  raw: cd /data/kubernetes/ssl && /data/kubernetes/bin/cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes  kube-proxy-csr.json | /data/kubernetes/bin/cfssljson -bare kube-proxy

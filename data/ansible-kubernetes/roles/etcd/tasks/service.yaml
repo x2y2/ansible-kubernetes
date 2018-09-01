@@ -1,0 +1,25 @@
+- name: send etcd binary files to etcd server
+  copy: src=bin/{{ item }} dest=/data/kubernetes/bin/{{ item }} mode=0755
+  with_items:
+  - etcd
+  - etcdctl
+
+- name: create etcd work directory
+  file: path={{ item }} owner=root group=root mode=0755 state=directory
+  with_items:
+  - /var/lib/etcd
+  - /etc/etcd
+
+- name: send etcd config files to etcd server
+  template: src=etcd.conf.template dest=/etc/etcd/etcd.conf  
+  notify: restart etcd
+ 
+- name: send etcd service file to etcd server
+  template: src=etcd.service.template dest=/lib/systemd/system/etcd.service
+  notify: restart etcd
+    
+- name: start etcd service
+  service:
+    name: etcd
+    state: started
+

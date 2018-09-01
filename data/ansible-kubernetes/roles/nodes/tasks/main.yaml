@@ -1,0 +1,7 @@
+---
+
+- include: kubeconfig.yaml
+- include: flannel-cni.yaml
+- include: docker.yaml
+- include: kubelet.yaml
+- include: kube-proxy-lvs.yaml

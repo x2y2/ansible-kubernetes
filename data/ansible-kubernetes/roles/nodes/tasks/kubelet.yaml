@@ -1,0 +1,20 @@
+---
+
+- name: create directories
+  file: 
+    path=/var/lib/kubelet
+    owner=root 
+    group=root 
+    mode=0755 
+    state=directory
+
+- name: sync files to all nodes
+  synchronize: src=bin/kubelet dest=/data/kubernetes/bin/kubelet
+
+- name: sync kubelet service files to all nodes
+  template: src=kubelet.service dest=/lib/systemd/system/kubelet.service
+  notify: restart kubelet
+
+- name: start service
+  service: name=kubelet  state=started
+    
