@@ -1,5 +1,7 @@
 ---
 - hosts: master
+  vars_files:
+  - roles/common/vars/main.yaml
   roles:
     - master
 

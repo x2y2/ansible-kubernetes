@@ -1,6 +1,6 @@
 ---
 - name: sync cfssl to all nodes
-  synchronize: src={{ role_path }}/../ca/files/bin/  dest=/data/kubernetes/bin/
+  synchronize: src={{ role_path}}/../ca/files/bin/  dest=/data/kubernetes/bin/
 
 - name: send ca to all nodes                                                                              
   template: src={{ role_path }}/../ca/files/csr/{{ item }} dest=/data/kubernetes/ssl/{{ item }}           

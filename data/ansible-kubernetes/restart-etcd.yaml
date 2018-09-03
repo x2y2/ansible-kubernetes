@@ -1,8 +1,0 @@
----
-
-- hosts: etcd
-  tasks:
-  - name: retart etcd cluster
-    service: 
-      name: etcd
-      state: restarted

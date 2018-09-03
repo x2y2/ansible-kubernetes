@@ -1,9 +1,0 @@
----
-
-REGISTRY: --insecure-registry=registry:5000
-ETCD_SERVERS: -etcd-endpoints=https://192.168.100.50:2379,https://192.168.100.51:2379,https://192.168.100.52:2379
-ETCD_PREFIX: -etcd-prefix=/kubernetes/network/
-INFRA_IMAGES: registry:5000/pause-amd64:3.1
-CLUSTER_DNS: 10.10.10.10
-BOOTSTRAP_TOKEN: 1b959fe844b7880d9c97bc2b73d87950 
-API_SERVER: https://192.168.100.50:6443

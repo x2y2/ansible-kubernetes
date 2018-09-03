@@ -1,0 +1,21 @@
+127.0.0.1	localhost
+127.0.1.1	kickseed
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+#registry
+{{ REGISTRY }} registry
+
+#etcd
+{{ ETCD1 }} etcd1
+{{ ETCD2 }} etcd2
+{{ ETCD3 }} etcd3
+
+#k8s
+{{ MASTER }} master
+{{ NODE1 }} node1
+{{ NODE2 }} node2
+

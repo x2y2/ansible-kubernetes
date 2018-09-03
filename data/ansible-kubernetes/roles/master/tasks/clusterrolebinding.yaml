@@ -1,9 +1,9 @@
 ---
 
-- name: get clusterrolebinding
-  raw: kubectl get clusterrolebinding|grep kubelet-bootstrap
-  register: output
+
+- name: send file to master
+  template: src=create-clusterrolebinding.sh.template dest=/data/kubernetes/bin/create-clusterrolebinding.sh mode=0755
 
 - name: create clusterrolebinding                                                                         
-  raw: kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
-  when: output == ""
+  command: /bin/bash /data/kubernetes/bin/create-clusterrolebinding.sh
+  when: ansible_ens2.ipv4.address == "{{ MASTER_NODE1 }}"

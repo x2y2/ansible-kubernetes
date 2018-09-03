@@ -1,1 +1,1 @@
-9c67c4dd3d2df673d632e4f681e9a146,kubelet-bootstrap,10001,"system:kubelet-bootstrap"
+{{ BOOTSTRAP_TOKEN }},kubelet-bootstrap,10001,"system:kubelet-bootstrap"

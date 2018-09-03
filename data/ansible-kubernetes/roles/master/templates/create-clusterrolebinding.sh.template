@@ -1,0 +1,7 @@
+#!/bin/bash
+kubectl get clusterrolebinding kubelet-bootstrap
+if [ $? -eq 0 ] ;then
+  exit 0
+else
+  kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+fi

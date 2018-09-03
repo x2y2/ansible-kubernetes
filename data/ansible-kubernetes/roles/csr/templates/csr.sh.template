@@ -1,0 +1,8 @@
+#!/bin/bash
+kubectl get csr|grep 'Pending'
+if [ $? -eq 0 ];then
+  kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| xargs kubectl certificate approve
+else
+  exit 0
+fi
+

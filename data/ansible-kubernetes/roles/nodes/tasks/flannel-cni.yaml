@@ -7,7 +7,7 @@
     state=directory
 
 - name: sync files to all nodes
-  synchronize: src=bin/flanneld  dest=/data/kubernetes/bin/flanneld
+  synchronize: src=bin/  dest=/data/kubernetes/bin/
 
 
 - name: sync config files to all nodes

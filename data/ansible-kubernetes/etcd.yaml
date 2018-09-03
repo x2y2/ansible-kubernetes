@@ -1,4 +1,6 @@
 ---
 - hosts: etcd
+  vars_files:
+  - roles/common/vars/main.yaml
   roles:
   - etcd
